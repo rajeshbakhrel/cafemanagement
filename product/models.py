@@ -120,25 +120,41 @@ class StockManagement(models.Model):
     product_item = models.ForeignKey(ProductItem,on_delete=models.CASCADE)
     description = models.TextField(blank=True,null=True)
     price = models.PositiveIntegerField(blank=True,null=True)
-    quantity = models.PositiveIntegerField()
-    product_deduce = models.PositiveIntegerField()
-    now_available = models.PositiveBigIntegerField()
+    quantity = models.PositiveIntegerField(blank = True,null = True)
+    # product_deduce = models.PositiveIntegerField(blank=True,null = True)
+    # now_available = models.PositiveIntegerField(blank = True,null = True)
     total_price = models.PositiveIntegerField(blank=True,null=True)
 
     
-    def calc_total_price(self):
-        if self.price is None or self.quantity is None:
-            return 0
-        return self.price * self.quantity
+    # def save(self,*args,**kwargs):
+    #     self.now_available = self.calc_now_available()
+    #     self.total_price = self.calc_total_price()
+    #     self.clean() 
+    #     super().save(*args,**kwargs)
+
+
+    # def calc_now_available(self):
+    #     # if self.quantity is None or  self.product_deduce is None:
+    #     #     return 0
+    #     quantity = self.quantity if self.quantity is not None else 0
+
+    #     product_deduce = self.product_deduce if self.product_deduce is not None else 0
+    #     cal = quantity - product_deduce
+    #     return max(cal, 0)
+
+    # def __str__(self):
+    #     return self.product_item.price
+
     
     def save(self,*args,**kwargs):
-        self.now_available = self.calc_now_available
+        # self.price = self.product_item.price
+        self.total_price = self.calc_total_price()
         super().save(*args,**kwargs)
-
-
-    def calc_now_available(self):
-        return self.quantity - self.product_deduce
     
+    def calc_total_price(self):
+        if self.product_item.price is None or self.quantity is None:
+            return 0
+        return self.product_item.price * self.quantity
 
 
 class Bill(models.Model):
@@ -149,6 +165,8 @@ class Bill(models.Model):
     payment_status = models.CharField(max_length=20, choices=[('Paid', 'Paid'), ('Unpaid', 'Unpaid')], default='Unpaid')  
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
     def save(self, *args, **kwargs):
         self.table_no = self.order_item.table_no
         self.total_amount = self.order_item.total_price

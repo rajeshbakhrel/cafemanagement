@@ -30,7 +30,7 @@ admin.site.register(Order_Item,Admin_OrderItem)
 
 
 class StockAdmin(admin.ModelAdmin):
-    list_display = ["id","menu","menu_item","product_item","description","price","quantity","total_price"]
+        list_display = ["id","menu","menu_item","product_item","description","price","quantity","total_price"]
 admin.site.register(StockManagement,StockAdmin)
 
 
